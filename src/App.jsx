@@ -1,10 +1,17 @@
 import { useState } from "react";
 
-export function Square({ onSquareClick, value }) {
+export function Square({ onSquareClick, value, isHighlight }) {
+  let bgcolor;
+  if (isHighlight) {
+    bgcolor = "bg-cyan-500 text-pink-500";
+  } else {
+    bgcolor = "bg-[#0f172a]";
+  }
+
   return (
     <button
       onClick={onSquareClick}
-      className="bg-[#0f172a] text-[whitesmoke] border-solid border border-[whitesmoke] float-left text-[72px] font-bold leading-[168px] h-[168px] w-[168px] -mr-[1px] -mt-[1px] p-0 text-center"
+      className={`${bgcolor} text-[whitesmoke] border-solid border border-[whitesmoke] float-left text-[72px] font-bold leading-[168px] h-[168px] w-[168px] -mr-[1px] -mt-[1px] p-0 text-center`}
     >
       {value}
     </button>
@@ -13,8 +20,9 @@ export function Square({ onSquareClick, value }) {
 
 export function Board({ xIsNext, squares, onPlay }) {
   const [length] = useState(3);
+  const [winningSquares, setWinningSquares] = useState([]);
 
-  const caculateWinner = (squares) => {
+  const calculateWinner = (squares) => {
     const lines = [
       [0, 1, 2],
       [3, 4, 5],
@@ -34,7 +42,7 @@ export function Board({ xIsNext, squares, onPlay }) {
         squares[a] === squares[b] &&
         squares[a] === squares[c]
       ) {
-        return squares[a];
+        return [a, b, c];
       }
     }
 
@@ -44,7 +52,7 @@ export function Board({ xIsNext, squares, onPlay }) {
   // this handle click to fill content
   const handleClick = (index) => {
     // if there filled or win then do nothing
-    if (squares[index] || caculateWinner(squares)) {
+    if (squares[index] || calculateWinner(squares)) {
       return;
     }
 
@@ -53,6 +61,11 @@ export function Board({ xIsNext, squares, onPlay }) {
       nextSquares[index] = "X";
     } else {
       nextSquares[index] = "O";
+    }
+
+    const winnerArray = calculateWinner(nextSquares);
+    if (winnerArray) {
+      setWinningSquares(winnerArray);
     }
     // change the status you need to use setXIsNext, instead of `xIsNext = !xIsNext;`
     // setXIsNext(!xIsNext);
@@ -67,15 +80,19 @@ export function Board({ xIsNext, squares, onPlay }) {
     <Square
       key={index}
       value={squares[index]}
+      isHighlight={winningSquares.includes(index) ? true : false}
       onSquareClick={() => handleClick(index)}
     />
   ));
 
   // judge the winner
   let tips;
-  const winner = caculateWinner(squares);
-  if (winner) {
-    tips = `The winner: ${winner}`;
+  const winnerArray = calculateWinner(squares);
+
+  if (winnerArray) {
+    tips = `The winner: ${squares[winnerArray[0]]}`;
+  } else if (squares.every((square) => square === "X" || square === "O")) {
+    tips = "The Game is over, result is being draw.";
   } else {
     tips = `Next Player: ${xIsNext ? "X" : "O"}`;
   }
@@ -117,6 +134,7 @@ export default function Game() {
     // setXIsNext(!xIsNext);
   };
 
+  // not need this
   /*   function jumpTo(nextMove) {
     setCurrentMove(nextMove);
     // setXIsNext(nextMove % 2 === 0);
@@ -144,14 +162,14 @@ export default function Game() {
     <div className="flex justify-evenly">
       <Board onPlay={handlePlay} xIsNext={xIsNext} squares={currentSquares} />
 
-      <div className="mr-40 mt-12">
+      <div className="mr-40 mt-4">
         <button
           onClick={toggleOrder}
           className="text-[whitesmoke] ml-44 mb-2 text-xl w-32 h-12 shadow-lg shadow-cyan-500/50 bg-lime-500 opacity-85 flex items-center justify-center"
         >
           {isAscend ? `Dscend` : "Ascend"}
         </button>
-        <ol className="text-[whitesmoke] text-center pt-20 text-xl h-[500px] w-[500px] border border-solid border-purple-400 shadow-lg shadow-cyan-500/50 bg-cyan-500 opacity-85">
+        <ol className="text-[whitesmoke] mt-8 text-center pt-20 text-xl h-[500px] w-[500px] border border-solid border-purple-400 shadow-lg shadow-cyan-500/50 bg-cyan-500 opacity-85">
           {isAscend ? moves : [moves[0], ...moves.slice(1).reverse()]}
         </ol>
       </div>
