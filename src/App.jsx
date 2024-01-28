@@ -140,10 +140,28 @@ export default function Game() {
     // setXIsNext(nextMove % 2 === 0);
   }
  */
+
+  // calculate location
+  const getMoveLocation = (currentSquares, prevSquares) => {
+    let moveIndex = 0;
+    for (let i = 0; i < currentSquares.length; i++) {
+      if (currentSquares[i] !== prevSquares[i]) {
+        moveIndex = i;
+        break;
+      }
+    }
+
+    const row = Math.floor(moveIndex / 3) + 1;
+    const col = (moveIndex % 3) + 1;
+
+    return { row, col, moveIndex };
+  };
+
   let moves = history.map((squares, index) => {
     let description;
     if (index > 0) {
-      description = `You are at move #${index}`;
+      const moveLocation = getMoveLocation(squares, history[index-1]);
+      description = `${ squares[moveLocation.moveIndex] } point at (${moveLocation.row}, ${moveLocation.col})`;
     } else {
       description = "Go to game start";
     }
