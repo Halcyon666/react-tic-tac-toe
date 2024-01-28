@@ -104,10 +104,11 @@ export default function Game() {
   // currentSquare
   const currentSquares = history[currentMove];
   const xIsNext = currentMove % 2 === 0;
+  const [isAscend, setIsAscend] = useState(true);
 
   // param passed by Board  ` onPlay(!xIsNext);`
   const handlePlay = (nextSquares) => {
-    // first currentMove = 0, and next history length is 2, 
+    // first currentMove = 0, and next history length is 2,
     // the next move is nextHistory.length-1 also can be currentMove+1,
     // when click, slice (0, 1) to include the nextSquares.
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
@@ -116,30 +117,43 @@ export default function Game() {
     // setXIsNext(!xIsNext);
   };
 
-  function jumpTo(nextMove) {
+  /*   function jumpTo(nextMove) {
     setCurrentMove(nextMove);
     // setXIsNext(nextMove % 2 === 0);
   }
-
-  const moves = history.map((squares, index) => {
+ */
+  let moves = history.map((squares, index) => {
     let description;
     if (index > 0) {
-      description = "Go to move #" + index;
+      description = `You are at move #${index}`;
     } else {
       description = "Go to game start";
     }
     return (
       <li key={index}>
-        <button onClick={() => jumpTo(index)}>{description}</button>
+        <ol>{description}</ol>
       </li>
     );
   });
 
+  const toggleOrder = () => {
+    setIsAscend(!isAscend);
+  };
+
   return (
     <div className="flex justify-evenly">
       <Board onPlay={handlePlay} xIsNext={xIsNext} squares={currentSquares} />
-      <div className="mt-24 mr-40 text-[whitesmoke] text-center pt-20 text-2xl h-[500px] w-[500px] border border-solid border-purple-400 shadow-lg shadow-cyan-500/50 bg-cyan-500 opacity-85">
-        <ol>{moves}</ol>
+
+      <div className="mr-40 mt-12">
+        <button
+          onClick={toggleOrder}
+          className="text-[whitesmoke] ml-44 mb-2 text-xl w-32 h-12 shadow-lg shadow-cyan-500/50 bg-lime-500 opacity-85 flex items-center justify-center"
+        >
+          {isAscend ? `Dscend` : "Ascend"}
+        </button>
+        <ol className="text-[whitesmoke] text-center pt-20 text-xl h-[500px] w-[500px] border border-solid border-purple-400 shadow-lg shadow-cyan-500/50 bg-cyan-500 opacity-85">
+          {isAscend ? moves : [moves[0], ...moves.slice(1).reverse()]}
+        </ol>
       </div>
     </div>
   );
