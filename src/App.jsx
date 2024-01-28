@@ -143,14 +143,14 @@ export default function Game() {
 
   // calculate location
   const getMoveLocation = (currentSquares, prevSquares) => {
-    let moveIndex = 0;
+    /* let moveIndex = 0;
     for (let i = 0; i < currentSquares.length; i++) {
       if (currentSquares[i] !== prevSquares[i]) {
         moveIndex = i;
         break;
       }
-    }
-
+    } */
+    const moveIndex = currentSquares.findIndex((square, index) => square !== prevSquares[index]);
     const row = Math.floor(moveIndex / 3) + 1;
     const col = (moveIndex % 3) + 1;
 
